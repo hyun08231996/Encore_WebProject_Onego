@@ -31,12 +31,18 @@
 			>
 			</v-combobox></div>
 		  <div style="float:left;width:3%;">
-			  <v-tooltip top>
+			  <v-tooltip top v-if="showBtn">
 				<template v-slot:activator="{ on, attrs }">
 					<v-btn icon height="6.5vh" v-bind="attrs" v-on="on" @click="generateTag"><v-icon>mdi-tag-plus-outline</v-icon></v-btn>
 				</template>
 				<span>태그 자동생성</span>
 		      </v-tooltip>
+			  <v-progress-circular v-if="isLoading"
+			    class="mt-4 ml-2"
+				indeterminate
+				width="2"
+				size="20"
+				color="#00d5aa"/>
 		  </div>
 	  </div>
 
@@ -86,6 +92,7 @@
 <script lang="ts">
 	import { Component, Vue, Watch } from 'vue-property-decorator';
 	import { namespace } from 'vuex-class';
+	import http from '@/http/http-common'
 
 	const WriteStoreModule = namespace('writeStore')
 
@@ -99,6 +106,8 @@
 		titleImage: File[] = []
 		//image = ''
 		content = ''
+		showBtn = true
+		isLoading = false
 
 		@WriteStoreModule.Getter('getTitleImage')
 		private getTitleImage!:File
@@ -180,26 +189,53 @@
 		}
 
 		generateTag():void{
+			this.isLoading = true
+			this.showBtn = false
+
 			var flag = false
-			var tag = ''
+			var tags = [] as string[]
 			var contentList = [] as string[]
 			var contents = [] as string[]
-			contentList.push(this.itemList[0].text.replaceAll("\n"," ").replaceAll("</p><p>"," "))
+			contentList.push(this.itemList[0].text.replaceAll("\n"," ").replaceAll("</p><p>"," ")
+											.replaceAll("<strong>","").replaceAll("</strong>","")
+											.replaceAll("<em>","").replaceAll("</em>","")
+											.replaceAll("<u>","").replaceAll("</u>",""))
 			if(this.itemList[0].children.length !== 0){
 				for(var i=0; i<this.itemList[0].children.length;i++){
-					contentList.push(this.itemList[0].children[i].text.replaceAll("\n"," ").replaceAll("</p><p>"," "))
+					contentList.push(this.itemList[0].children[i].text.replaceAll("\n"," ").replaceAll("</p><p>"," ")
+														.replaceAll("<strong>","").replaceAll("</strong>","")
+														.replaceAll("<em>","").replaceAll("</em>","")
+														.replaceAll("<u>","").replaceAll("</u>",""))
 				}
 			}
 			contents.push(contentList.join(" "))
-			console.log(contents)
+			//console.log(contents)
 
-			////////////////axios here///////////////////
+			http.
+				post('/ai/tagger',
+					{"contents":contents}
+				)
+				.then(response=>{
+					if (response.status >=200 && response.status < 204){
+						//console.log(response.data)
+						console.log("success")
+						tags = response.data
+						for(var j=0;j<tags.length;j++){
+							for(var k=0;k<this.tagList.length;k++){
+								if(this.tagList[k] === tags[j]) flag = true
+							}
+							if(flag === false)
+								this.tagList.push(tags[j])
+						}
+						this.isLoading = false
+						this.showBtn = true
+					} else{
+						//console.log(response)
+						console.log("fail..")
+					}
+				})
 
-			// for(var i=0;i<this.tagList.length;i++){
-			// 	if(this.tagList[i] === tag) flag = true
-			// }
-			// if(flag === false)
-			// 	this.tagList.push(tag)
+			
 		}
 
 	}

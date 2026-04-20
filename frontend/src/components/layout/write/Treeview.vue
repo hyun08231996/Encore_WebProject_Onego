@@ -94,10 +94,11 @@
 	@Component
 	export default class Treeview extends Vue {
 		@Prop({ type: String }) readonly tempBoardId!: string
+		@Prop({ type: String }) readonly boardId!: string
 
 		tree = []
-		showTree = false
-		toggleSignIndex = true
+		showTree = true
+		toggleSignIndex = false
 		isMenu = false
 		isDeletable = true
 		curId = 0
@@ -124,8 +125,9 @@
 
 		mounted () {
 			eventBus.$on("clickFirstTree",this.clickFirstTree)
+			eventBus.$on("clickFirstTreePost",this.clickFirstTree)
 			//console.log(this.tempBoardId)
-			if(this.tempBoardId===undefined){
+			if(this.tempBoardId===undefined || this.boardId === undefined){
 				let element: HTMLElement = document.getElementsByClassName('v-treeview-node__label')[0].children[0].children[0] as HTMLElement
 				element.click()
 			}

@@ -12,6 +12,7 @@
 
 <script lang="ts">
 	import { Component, Vue, Watch } from 'vue-property-decorator';
+	import { eventBus } from '@/main'
 
 	@Component
 	export default class DarkModeSwitch extends Vue {
@@ -21,13 +22,23 @@
 		watchSwitch1():void{
 			//console.log(this.switch1)
 			if(this.switch1 == true){
-				//
+				setTimeout(()=>{
+					this.$vuetify.theme.dark = true
+				},10)
+				
+				eventBus.$emit('toDark',true)
+			}else{
+				setTimeout(()=>{
+					this.$vuetify.theme.dark = false
+				},10)
+				
+				eventBus.$emit('toLight',false)
 			}
 		}
 
 	}
 </script>
 
-<style scoped>
+<style>
 
 </style>

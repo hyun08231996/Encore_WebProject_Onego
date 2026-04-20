@@ -1,31 +1,43 @@
 <template>
-    <v-container
-    fluid
-    class="pa-0"
-    >
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"
-    />
-    <v-btn
-        icon
-        color="#00d5aa"
-    >
-        <span style="font-size: 1.8em;"><i class="fas fa-trash-alt"></i></span>
+    <v-btn rounded outlined color="#00d5aa" class="ma-2 px-8" id="scrap-btn" 
+    @click="postdelete()">
+        삭제
     </v-btn>
-    </v-container>
 </template>
 
 
 <script lang="ts">
 import Vue from 'vue'
+import http from '@/http/http-common'
 
 export default Vue.extend({
-    name:"DeleteBtn",
+    props:{
+        boardId:String
+    },
+    name:"PostDeleteBtn",
     data: ()=>({
     }),
     methods:{
-    }
+        postdelete(){
+          var con_test = confirm("글을 삭제하시겠습니까?");
+          if(con_test == true){
+              http
+                .delete('/board', {
+                data: {'boardId': this.boardId}, 
+                headers:{
+                        'Authorization': 'Bearer '+localStorage.getItem('accessToken')
+                    }})
+                .then(response => {
+                     location.href = '/article'
+                })
+          }
+          else if(con_test == false){
+              return
+          }
+          
+        }
+    },
+    
 
 })
 </script>>
@@ -35,3 +47,4 @@ export default Vue.extend({
 
 
 </style>
+

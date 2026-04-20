@@ -63,7 +63,7 @@
 		},
 	})
 	export default class Memo extends Vue {
-		toggleSignMemo = true
+		toggleSignMemo = false
 		isReadonly = true
 
 		@WriteStoreModule.Getter('getMemoList')

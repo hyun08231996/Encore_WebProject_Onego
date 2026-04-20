@@ -125,7 +125,7 @@
   
   .title-card .v-label {
       font-style: italic;
-      opacity: 65%;
+      opacity: .65 !important;
   }
   
   .title-card .v-text-field--outlined.v-input--dense .v-label {
