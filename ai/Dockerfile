@@ -6,16 +6,30 @@ ENV LANG=C.UTF-8
 ENV TZ=Asia/Seoul
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends tzdata g++ git curl
-
-# installing java jdk and java jre
-RUN apt-get install -y openjdk-17-jdk
-
-# installing python3 and pip3
-RUN apt-get install -y python3 python3-venv python3-pip python3-setuptools python3-wheel python3-pkg-resources python3-distutils python3-dev python3-numpy python3-pandas python3-matplotlib python3-networkx python3-scipy python3-lxml libxml2-dev libxslt1-dev zlib1g-dev libblas-dev liblapack-dev gfortran mecab libmecab-dev mecab-ipadic-utf8 python3-mecab
-
-# apt cleanse
-RUN apt-get clean && \
+    apt-get install -y --no-install-recommends \
+        tzdata \
+        g++ \
+        git \
+        curl \
+        openjdk-17-jdk \
+        python3 \
+        python3-venv \
+        python3-pip \
+        python3-setuptools \
+        python3-dev \
+        python3-numpy \
+        python3-pandas \
+        python3-matplotlib \
+        python3-networkx \
+        python3-scipy \
+        python3-lxml \
+        libxml2-dev \
+        libxslt1-dev \
+        zlib1g-dev \
+        libblas-dev \
+        liblapack-dev \
+        gfortran && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # timezone
