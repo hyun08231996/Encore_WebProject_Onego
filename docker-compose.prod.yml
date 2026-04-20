@@ -1,0 +1,54 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VUE_APP_AWS_REGION: ${VUE_APP_AWS_REGION}
+        VUE_APP_COGNITO_IDENTITY_POOL_ID: ${VUE_APP_COGNITO_IDENTITY_POOL_ID}
+        VUE_APP_COGNITO_USER_POOL_ID: ${VUE_APP_COGNITO_USER_POOL_ID}
+        VUE_APP_COGNITO_APP_CLIENT_ID: ${VUE_APP_COGNITO_APP_CLIENT_ID}
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+      - ai
+    ports:
+      - "80:80"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+      GCP_STORAGE_BUCKET: ${GCP_STORAGE_BUCKET}
+      COGNITO_ISSUER_URI: ${COGNITO_ISSUER_URI}
+
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL}
+
+  seed:
+    image: mongo:7
+    profiles: ["seed"]
+    volumes:
+      - ./scripts/seed-mongo.js:/seed/seed-mongo.js:ro
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
+    command:
+      - sh
+      - -c
+      - mongosh "$MONGODB_URI" /seed/seed-mongo.js

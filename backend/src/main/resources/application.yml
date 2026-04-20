@@ -8,12 +8,7 @@ spring:
       max-request-size: 20MB
   data:
     mongodb:
-      host: ${MONGO_HOST}
-      port: ${MONGO_PORT}
-      authentication-database: ${MONGO_AUTH_DB}
-      database: ${MONGO_DB}
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+      uri: ${MONGODB_URI:mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}?authSource=${MONGO_AUTH_DB}}
   security:
     oauth2:
       resourceserver:
