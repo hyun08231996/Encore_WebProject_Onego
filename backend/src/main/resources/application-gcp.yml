@@ -1,0 +1,4 @@
+cloud:
+  gcp:
+    storage:
+      bucket: ${GCP_STORAGE_BUCKET}

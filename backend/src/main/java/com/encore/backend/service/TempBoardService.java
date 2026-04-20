@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.encore.backend.dto.TempBoardDTO;
 import com.encore.backend.repository.tempboard.TempBoardRepository;
-import com.encore.backend.s3.S3Uploader;
+import com.encore.backend.storage.StorageUploader;
 import com.encore.backend.vo.TempBoard;
 
 import org.modelmapper.ModelMapper;
@@ -22,12 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 public class TempBoardService {
 
     private TempBoardRepository tempBoardRepository;
-    private final S3Uploader s3Uploader;
+    private final StorageUploader storageUploader;
 
     @Autowired
-    public TempBoardService(TempBoardRepository tempBoardRepository, S3Uploader s3Uploader) {
+    public TempBoardService(TempBoardRepository tempBoardRepository, StorageUploader storageUploader) {
         this.tempBoardRepository = tempBoardRepository;
-        this.s3Uploader = s3Uploader;
+        this.storageUploader = storageUploader;
     }
 
     public List<TempBoard> findAllByUser_id(String userEmail, int pageNumber) {
@@ -55,7 +55,7 @@ public class TempBoardService {
                     return null;
             }
             tempBoard.setTitleImage(titleImageFile.getOriginalFilename().length() == 0 ? ""
-                    : s3Uploader.upload(titleImageFile, "titleImages", tempBoard.getId()));
+                    : storageUploader.upload(titleImageFile, "titleImages", tempBoard.getId()));
             tempBoardRepository.save(tempBoard);
             return tempBoard.getId();
 
