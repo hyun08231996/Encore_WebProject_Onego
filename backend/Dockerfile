@@ -5,8 +5,7 @@ COPY ./ ./
 RUN mvn package
 
 # openjdk 이미지에 builder에서 생성된 *.jar파일을 복사
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:11-jre
 WORKDIR /app
-ARG --from=builder JAR_FILE=/app/target/*.jar
-COPY --from=builder ${JAR_FILE} app.jar
+COPY --from=builder /app/target/*.jar app.jar
 CMD ["java", "-jar", "app.jar"]

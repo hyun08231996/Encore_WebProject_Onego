@@ -1,7 +1,7 @@
-FROM node:12-alpine AS builder
+FROM node:16-alpine AS builder
 WORKDIR /app
 COPY package.json ./
-RUN yarn install
+RUN yarn install --ignore-engines
 COPY ./ ./
 RUN yarn run build
 
