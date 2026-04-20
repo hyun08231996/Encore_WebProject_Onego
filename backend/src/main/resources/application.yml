@@ -1,18 +1,21 @@
 spring:
   profiles:
-    includes:
-      - aws
-      - credentials
+    include:
+      - gcp
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   data:
     mongodb:
-      host: onegodev.ddns.net
-      port: 2727
-      authentication-database: admin
-      database: onego
-      username: onego
-      password: test123
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      authentication-database: ${MONGO_AUTH_DB}
+      database: ${MONGO_DB}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_brwr9Qyvh
+          issuer-uri: ${COGNITO_ISSUER_URI}

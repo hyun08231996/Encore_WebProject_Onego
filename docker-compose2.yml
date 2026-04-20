@@ -1,5 +1,30 @@
-version: "3"
 services:
+    mongo:
+        image: mongo:7
+        restart: unless-stopped
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+            MONGO_INITDB_DATABASE: ${MONGO_DB}
+        ports:
+            - "27017:27017"
+        volumes:
+            - mongo-data:/data/db
+        healthcheck:
+            test: ["CMD", "mongosh", "--quiet", "-u", "${MONGO_USERNAME}", "-p", "${MONGO_PASSWORD}", "--authenticationDatabase", "${MONGO_AUTH_DB}", "${MONGO_DB}", "--eval", "db.runCommand({ ping: 1 }).ok"]
+            interval: 60s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+    seed:
+        image: mongo:7
+        depends_on:
+            mongo:
+                condition: service_healthy
+        volumes:
+            - ./scripts/seed-mongo.js:/seed/seed-mongo.js:ro
+        command: >
+            sh -c "mongosh -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase ${MONGO_AUTH_DB} mongodb://mongo:${MONGO_PORT}/${MONGO_DB} /seed/seed-mongo.js"
     frontend:
         build:
             dockerfile: Dockerfile
@@ -16,9 +41,32 @@ services:
         build:
             dockerfile: Dockerfile
             context: ./backend
+        depends_on:
+            mongo:
+                condition: service_healthy
+            seed:
+                condition: service_completed_successfully
+        environment:
+            MONGO_HOST: ${MONGO_HOST}
+            MONGO_PORT: ${MONGO_PORT}
+            MONGO_AUTH_DB: ${MONGO_AUTH_DB}
+            MONGO_DB: ${MONGO_DB}
+            MONGO_USERNAME: ${MONGO_USERNAME}
+            MONGO_PASSWORD: ${MONGO_PASSWORD}
+            GCP_STORAGE_BUCKET: ${GCP_STORAGE_BUCKET}
+            COGNITO_ISSUER_URI: ${COGNITO_ISSUER_URI}
+            GOOGLE_APPLICATION_CREDENTIALS: /gcp/application_default_credentials.json
+        volumes:
+            - ${HOME}/.config/gcloud/application_default_credentials.json:/gcp/application_default_credentials.json:ro
     ai:
         build:
             dockerfile: Dockerfile
             context: ./ai
+        environment:
+            GEMINI_API_KEY: ${GEMINI_API_KEY}
+            GEMINI_MODEL: ${GEMINI_MODEL}
         volumes:
             - ./ai:/app
+
+volumes:
+    mongo-data:
