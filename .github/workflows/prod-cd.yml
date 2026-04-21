@@ -14,6 +14,12 @@ permissions:
 
 env:
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GAR_LOCATION: ${{ vars.GAR_LOCATION }}
+  GAR_REPOSITORY: ${{ vars.GAR_REPOSITORY }}
+  FRONTEND_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/frontend:prod
+  BACKEND_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/backend:prod
+  AI_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/ai:prod
+  NGINX_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/nginx:prod
 
 jobs:
   deploy:
@@ -22,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -32,6 +41,34 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Render production env file
+        run: |
+          cat > .env.prod <<EOF
+          FRONTEND_IMAGE=${FRONTEND_IMAGE}
+          BACKEND_IMAGE=${BACKEND_IMAGE}
+          AI_IMAGE=${AI_IMAGE}
+          NGINX_IMAGE=${NGINX_IMAGE}
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          GCP_STORAGE_BUCKET=${{ secrets.GCP_STORAGE_BUCKET }}
+          COGNITO_ISSUER_URI=${{ secrets.COGNITO_ISSUER_URI }}
+          HUGGINGFACE_API_KEY=${{ secrets.HUGGINGFACE_API_KEY }}
+          HUGGINGFACE_MODEL=${{ secrets.HUGGINGFACE_MODEL }}
+          EOF
+
+      - name: Ensure app directory exists on VM
+        run: |
+          gcloud compute ssh "${{ secrets.GCE_SSH_USER }}@${{ vars.GCE_VM_NAME }}" \
+            --zone "${{ vars.GCE_VM_ZONE }}" \
+            --command "mkdir -p '${{ vars.GCE_APP_DIR }}'"
+
+      - name: Upload compose and env files to VM
+        run: |
+          gcloud compute scp \
+            docker-compose.prod.yml \
+            .env.prod \
+            "${{ secrets.GCE_SSH_USER }}@${{ vars.GCE_VM_NAME }}:${{ vars.GCE_APP_DIR }}/" \
+            --zone "${{ vars.GCE_VM_ZONE }}"
 
       - name: Pull and restart services on VM
         run: |
