@@ -12,6 +12,10 @@ services:
       - ai
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/onego/certbot/www:/var/www/certbot:ro
+      - /opt/onego/certbot/conf:/etc/letsencrypt:ro
 
   backend:
     image: ${BACKEND_IMAGE}
