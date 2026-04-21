@@ -1,0 +1,67 @@
+name: Prod CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  GAR_LOCATION: ${{ vars.GAR_LOCATION }}
+  GAR_REPOSITORY: ${{ vars.GAR_REPOSITORY }}
+  FRONTEND_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/frontend:prod
+  BACKEND_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/backend:prod
+  AI_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/ai:prod
+  NGINX_IMAGE: ${{ vars.GAR_LOCATION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/nginx:prod
+
+jobs:
+  build-and-push:
+    name: Build And Push Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker "${GAR_LOCATION}-docker.pkg.dev" --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push linux/amd64 images
+        env:
+          VUE_APP_AWS_REGION: ${{ secrets.VUE_APP_AWS_REGION }}
+          VUE_APP_COGNITO_IDENTITY_POOL_ID: ${{ secrets.VUE_APP_COGNITO_IDENTITY_POOL_ID }}
+          VUE_APP_COGNITO_USER_POOL_ID: ${{ secrets.VUE_APP_COGNITO_USER_POOL_ID }}
+          VUE_APP_COGNITO_APP_CLIENT_ID: ${{ secrets.VUE_APP_COGNITO_APP_CLIENT_ID }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          GCP_STORAGE_BUCKET: ${{ secrets.GCP_STORAGE_BUCKET }}
+          COGNITO_ISSUER_URI: ${{ secrets.COGNITO_ISSUER_URI }}
+          HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+          HUGGINGFACE_MODEL: ${{ secrets.HUGGINGFACE_MODEL }}
+        run: |
+          docker buildx bake \
+            -f docker-compose.prod.build.yml \
+            frontend backend ai nginx \
+            --set frontend.platform=linux/amd64 \
+            --set backend.platform=linux/amd64 \
+            --set ai.platform=linux/amd64 \
+            --set nginx.platform=linux/amd64 \
+            --push
