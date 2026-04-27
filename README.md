@@ -4,7 +4,10 @@
 
 # ONEGO
 
-<img width="1504" height="636" alt="image" src="https://github.com/user-attachments/assets/356103ed-d44c-41ad-8c64-52a0e6c67c9f" />
+<img width="1927" height="816" alt="image" src="https://github.com/user-attachments/assets/e04bd2ca-cdb9-40ce-b495-834c35558ecb" />
+
+
+<br />
 
 ONEGO is an AI-assisted writing and blogging platform built for people who have difficulty starting, organizing, or finishing long-form writing. It supports drafting, publishing, searching, and managing blog-style posts, while AI features help with sentence completion, text summarization, and tag generation.
 
@@ -26,8 +29,55 @@ The application combines a Vue writing experience, a Spring Boot API, MongoDB pe
 - Designed and implemented the header, sidebar, footer, search, search results, account settings, edit profile, my profile, change password, saved blogs, posted blogs, and blog writing pages.
 - Added writing-page tools for font styling, content folder management, memos, tags, image upload, preview, and post editing.
 
-## Screenshots
+## Screenshots/Demo
 
+<table>
+  <tr>
+    <td><img alt="onego_main" src="https://github.com/user-attachments/assets/f614edfd-a9ac-4b7e-8cf0-2e28b24b943d" /></td>
+    <td><img alt="onego_bloglist" src="https://github.com/user-attachments/assets/c6156873-32aa-44b2-88e2-b16d6483d28f" />
+</td>
+    <td><img alt="onego_blogpost" src="https://github.com/user-attachments/assets/ca6911a2-3d50-45d8-9b81-ab276925e6a5" />
+</td>
+    <td><img alt="onego_login" src="https://github.com/user-attachments/assets/14691f8a-e837-4120-8739-7f70e5f8b372" />
+</td>
+  </tr>
+  <tr>
+    <td>Main page</td>
+    <td>Blogs list</td>
+    <td>Blog post</td>
+    <td>Search blogs</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img alt="onego_login" src="https://github.com/user-attachments/assets/b42e9b16-61ab-4285-9881-cce9ba2aef08" />
+</td>
+    <td><img alt="onego_profile" src="https://github.com/user-attachments/assets/ad3794f2-8b9c-4284-a3d5-b7c2e20faf90" />
+</td>
+    <td><img alt="onego_writer" src="https://github.com/user-attachments/assets/dd996fd4-7234-4a34-bc24-e98fbed40f84" />
+</td>
+    <td><img alt="onego_writer_dark" src="https://github.com/user-attachments/assets/dab14faa-b02a-451e-9383-20423ed0ae5c" />
+</td>
+  </tr>
+  <tr>
+    <td>Login</td>
+    <td>Profile</td>
+    <td>Writer</td>
+    <td>Writer (Dark)</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td>
+      <img alt="onego_auto_tab" src="https://github.com/user-attachments/assets/2136b247-35c2-4021-90c3-f4a07886ca4b" />
+    </td>
+    <td>
+      <img alt="onego_auto_click" src="https://github.com/user-attachments/assets/6991fd66-b7f0-43a5-9cd1-f3f005795fbe" />
+    </td>
+  </tr>
+</table>
 
 
 ## Notable Features
@@ -41,6 +91,7 @@ With one action, the AI service can generate:
 - Subtitles by summarizing the full draft.
 
 ### User-Friendly Writing Tool
+
 
 - Dark mode to reduce eye strain: [source](./frontend/src/components/buttons/write/DarkModeSwitch.vue), [demo](https://youtu.be/oDfjhOdMj88?t=166).
 - Tooltips for writing controls and navigation buttons: [demo](https://youtu.be/oDfjhOdMj88?t=48).
