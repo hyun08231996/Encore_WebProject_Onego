@@ -117,7 +117,8 @@ With one action, the AI service can generate:
 
 ## Architecture
 
-<img width="1672" height="941" alt="onego_structure" src="https://github.com/user-attachments/assets/3f778b6b-4641-4d7e-bff1-b0c0ebc71c52" />
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/7a9a467b-acc7-463a-91ac-36b44b8e9e82" />
+
 
 
 > [!NOTE]
