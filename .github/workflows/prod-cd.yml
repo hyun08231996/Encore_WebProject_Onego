@@ -74,4 +74,4 @@ jobs:
         run: |
           gcloud compute ssh "${{ secrets.GCE_SSH_USER }}@${{ vars.GCE_VM_NAME }}" \
             --zone "${{ vars.GCE_VM_ZONE }}" \
-            --command "cd '${{ vars.GCE_APP_DIR }}' && docker compose --env-file .env.prod -f docker-compose.prod.yml pull && docker compose --env-file .env.prod -f docker-compose.prod.yml up -d && docker image prune -f"
+            --command "cd '${{ vars.GCE_APP_DIR }}' && docker compose --env-file .env.prod -f docker-compose.prod.yml pull && docker compose --env-file .env.prod -f docker-compose.prod.yml up -d && docker container prune -f && docker image prune -af && docker builder prune -af"
